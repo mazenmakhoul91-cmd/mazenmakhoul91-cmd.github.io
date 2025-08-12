@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة الراتب السنوية المتعددة الزيادات</title>
+    <!-- تضمين خط Google Fonts: Cairo لخط عربي جميل -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* تعريف متغيرات الألوان */
+        :root {
+            --primary-color: #4CAF50; /* أخضر */
+            --secondary-color: #388E3C; /* أخضر داكن */
+            --background-color: #f0f8f0; /* أخضر فاتح جداً */
+            --text-color: #333;
+            --light-text-color: #f9f9f9;
+            --card-background: #ffffff;
+            --border-color: #ddd;
+            --button-hover-color: #2e7d32;
+            --input-border-color: #ccc;
+            --focus-border-color: #8BC34A;
+            --table-header-bg: #e6ffe6; /* خلفية جدول فاتحة */
+            --table-row-hover: #f0fff0; /* خلفية الصف عند التحويم */
+            --ai-feature-bg: #f9f9e6; /* خلفية قسم الذكاء الاصطناعي */
+            --ai-feature-border: #CCCC66; /* حدود قسم الذكاء الاصطناعي */
+            --remove-btn-color: #dc3545; /* أحمر لزر الحذف */
+            --remove-btn-hover-color: #c82333;
+        }
+
+        /* تنسيق عام للصفحة */
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 25px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: right; /* محاذاة النص لليمين */
+            border: 1px solid var(--border-color);
+        }
+
+        /* تنسيق الرأس (Header) */
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            padding: 25px 0;
+            border-radius: 10px 10px 0 0;
+            margin: -25px -25px 20px -25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* تنسيق حقول الإدخال لتكون في المنتصف */
+        .input-options {
+            display: flex;
+            flex-direction: column; /* ترتيب العناصر عمودياً */
+            align-items: center; /* توسيط العناصر أفقياً */
+            padding-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* توسيط عناصر مجموعة الإدخال نفسها */
+            width: 100%; /* اجعل مجموعة الإدخال تأخذ العرض الكامل للحاوية */
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #555;
+            font-weight: 600;
+            text-align: right; /* محاذاة النص داخل الإدخال لليمين */
+            width: 100%; /* للتأكد من أن النص يتبع التوسيط مع الحقل */
+            max-width: 300px; /* نفس عرض حقل الإدخال */
+        }
+
+        .input-group input[type="number"] {
+            width: 100%;
+            max-width: 300px; /* تحديد عرض معقول لحقول الإدخال */
+            padding: 12px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.05em;
+            color: var(--text-color);
+            text-align: right; /* محاذاة النص داخل الإدخال لليمين */
+            box-sizing: border-box; /* تضمين الحشوة والحدود في العرض الكلي */
+        }
+
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: var(--focus-border-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        /* تنسيق الأزرار */
+        .button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--light-text-color);
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 1.05em;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-left: 10px; /* مسافة بين الأزرار */
+        }
+
+        .button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+
+        /* تنسيق منطقة النتائج */
+        #results-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px dashed var(--border-color);
+            display: none;
+        }
+
+        #results-section h2 {
+            color: var(--primary-color);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #total-salary-display {
+            background-color: var(--table-header-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-align: center;
+            border: 1px solid var(--primary-color);
+        }
+
+        /* تنسيق الجدول */
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .salary-table th, .salary-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: right;
+        }
+
+        .salary-table th {
+            background-color: var(--table-header-bg);
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        .salary-table tbody tr:nth-child(even) {
+            background-color: var(--background-color);
+        }
+
+        .salary-table tbody tr:hover {
+            background-color: var(--table-row-hover);
+        }
+
+        /* تنسيق رسائل الخطأ */
+        #error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        /* تنسيق قسم الذكاء الاصطناعي الجديد */
+        .ai-analysis-section {
+            margin-top: 40px;
+            padding: 25px;
+            border: 1px solid var(--ai-feature-border);
+            border-radius: 12px;
+            background-color: var(--ai-feature-bg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            text-align: right;
+            display: none;
+        }
+
+        .ai-analysis-section h2 {
+            color: var(--secondary-color);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #ai-output {
+            background-color: var(--card-background);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 80px;
+            text-align: right;
+            border: 1px solid var(--border-color);
+            color: #444;
+            font-size: 1.05em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #ai-loading-indicator {
+            display: none;
+            margin-top: 15px;
+            color: var(--secondary-color);
+            font-weight: 700;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        /* تنسيق حقول الزيادات الإضافية المتعددة */
+        .additional-increases-container {
+            width: 100%;
+            max-width: 400px; /* لتقييد عرض الحاوية */
+            margin: 20px auto; /* توسيط الحاوية */
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: var(--background-color);
+            text-align: center; /* توسيط محتوى الحاوية */
+        }
+
+        .additional-increases-container h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .additional-increase-item {
+            display: flex;
+            flex-wrap: wrap; /* للسماح للعناصر بالنزول لسطر جديد على الشاشات الصغيرة */
+            justify-content: center; /* توسيط العناصر داخل العنصر */
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background-color: var(--card-background);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .additional-increase-item input {
+            width: calc(50% - 15px); /* تقسيم العرض بين حقلين مع مراعاة الفجوة */
+            max-width: 120px; /* لضمان عدم تمدد كبير */
+            padding: 8px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95em;
+            text-align: right;
+            box-sizing: border-box;
+        }
+        
+        /* ضبط عرض مدخل السنة و النسبة ليكونوا بجانب بعضهم و متجاوبين */
+        .additional-increase-item input[type="number"]:first-of-type { /* السنة */
+            flex-grow: 1; /* السماح بالتمدد */
+        }
+        .additional-increase-item input[type="number"]:last-of-type { /* النسبة */
+            flex-grow: 1; /* السماح بالتمدد */
+        }
+
+
+        .remove-increase-btn {
+            background-color: var(--remove-btn-color);
+            color: var(--light-text-color);
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .remove-increase-btn:hover {
+            background-color: var(--remove-btn-hover-color);
+        }
+
+        #add-new-increase-btn {
+            background-color: var(--primary-color);
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            width: auto;
+        }
+
+        #add-new-increase-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* استجابة التصميم للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .input-group input[type="number"] {
+                max-width: 100%;
+            }
+
+            .additional-increases-container {
+                max-width: 100%;
+                padding: 10px;
+            }
+
+            .additional-increase-item {
+                flex-direction: column; /* تكديس العناصر عمودياً على الشاشات الصغيرة */
+                gap: 5px;
+            }
+            .additional-increase-item input {
+                width: 100%; /* تأخذ العرض الكامل */
+                max-width: none;
+            }
+
+            .salary-table {
+                font-size: 0.85em;
+            }
+
+            .salary-table th, .salary-table td {
+                padding: 8px;
+            }
+        }
+
+        /* تنسيقات خاصة بالطباعة */
+        @media print {
+            body {
+                background-color: #fff; /* خلفية بيضاء للطباعة */
+                margin: 0;
+                padding: 0;
+                display: block; /* إلغاء flexbox للجسم لترتيب طبيعي */
+            }
+            .container {
+                width: 100%;
+                max-width: none; /* السماح بملء العرض المتاح */
+                margin: 0;
+                padding: 0;
+                box-shadow: none; /* إزالة الظلال */
+                border: none; /* إزالة الحدود */
+                border-radius: 0;
+            }
+            header,
+            p, /* الفقرات التمهيدية */
+            .input-options, /* قسم المدخلات */
+            .button, /* زر الحساب */
+            #error-message, /* رسالة الخطأ */
+            #ai-loading-indicator, /* مؤشر تحميل الذكاء الاصطناعي */
+            #add-new-increase-btn, /* زر إضافة زيادة جديدة */
+            .remove-increase-btn /* زر إزالة الزيادة */
+             {
+                display: none !important; /* إخفاء هذه العناصر عند الطباعة */
+            }
+            #results-section,
+            .ai-analysis-section {
+                display: block !important; /* التأكد من ظهور أقسام النتائج والتحليل */
+                margin-top: 20px;
+                padding-top: 0;
+                border-top: none;
+                box-shadow: none;
+                border: none;
+                background-color: #fff;
+            }
+            .salary-table {
+                width: 100%;
+                font-size: 0.9em; /* ضبط حجم الخط للجدول في الطباعة */
+            }
+            .salary-table th, .salary-table td {
+                padding: 8px;
+                border: 1px solid #000; /* حدود داكنة للطباعة */
+            }
+            #total-salary-display {
+                background-color: #f0f0f0; /* خلفية فاتحة غير مزعجة */
+                color: #000;
+                border: 1px solid #ccc;
+                font-size: 1.1em;
+            }
+            #ai-output {
+                background-color: #f0f0f0;
+                color: #000;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>حاسبة الراتب السنوية المتقدمة 💰</h1>
+        </header>
+
+        <p>
+            هذه الأداة تساعدك على تقدير نمو راتبك الأساسي على مدار سنوات محددة، مع الأخذ في الاعتبار نسبة زيادة سنوية ثابتة وزيادات إضافية دورية أو لمرة واحدة في سنوات محددة.
+            أدخل التفاصيل للحصول على التوقعات المفصلة.
+        </p>
+
+        <div class="input-options">
+            <div class="input-group">
+                <label for="basic-salary">الراتب الأساسي الحالي (دينار أردني):</label>
+                <input type="number" id="basic-salary" value="500" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="annual-increase">نسبة الزيادة السنوية العادية (٪):</label>
+                <input type="number" id="annual-increase" value="5" min="0" step="0.1">
+            </div>
+
+            <div class="input-group">
+                <label for="number-of-years">عدد سنوات الحساب:</label>
+                <input type="number" id="number-of-years" value="30" min="1" max="100">
+            </div>
+
+            <div class="input-group">
+                <label for="start-year">سنة البدء (مثال: 2026):</label>
+                <input type="number" id="start-year" value="2026" min="1900" max="2100">
+            </div>
+
+            <div class="additional-increases-container">
+                <h3>الزيادات الإضافية المخصصة</h3>
+                <p>أدخل السنة الفعلية (مثال: 2030) ونسبة الزيادة لتطبيق زيادة إضافية لمرة واحدة.</p>
+                <div id="dynamic-additional-increases">
+                    <!-- سيتم إضافة حقول الزيادة هنا بواسطة JavaScript -->
+                </div>
+                <button id="add-new-increase-btn" class="button" style="margin-left: 0;">+ إضافة زيادة جديدة</button>
+            </div>
+        </div>
+
+        <button id="calculate-btn" class="button">احسب الراتب 📈</button>
+        <button id="print-btn" class="button">طباعة النتائج 🖨️</button> <!-- زر الطباعة الجديد -->
+
+        <div id="error-message"></div>
+
+        <div id="results-section">
+            <h2>تفاصيل الراتب السنوية</h2>
+            <div id="total-salary-display"></div>
+            <table class="salary-table">
+                <thead>
+                    <tr>
+                        <th>العام</th>
+                        <th>الراتب في بداية العام</th>
+                        <th>مبلغ الزيادة السنوية</th>
+                        <th>الراتب في نهاية العام</th>
+                    </tr>
+                </thead>
+                <tbody id="salary-table-body">
+                    <!-- سيتم تعبئة البيانات هنا بواسطة JavaScript -->
+                </tbody>
+            </table>
+
+            <!-- قسم تحليل الذكاء الاصطناعي الجديد -->
+            <div class="ai-analysis-section" id="ai-analysis-section">
+                <h2>✨ تحليل الراتب بالذكاء الاصطناعي ✨</h2>
+                <p>احصل على ملاحظات ونصائح مالية موجزة بناءً على مسار راتبك المتوقع.</p>
+                <button id="analyze-salary-btn" class="button">تحليل الراتب 💡</button>
+                <div id="ai-loading-indicator">جاري التحليل...</div>
+                <div id="ai-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const basicSalaryInput = document.getElementById('basic-salary');
+            const annualIncreaseInput = document.getElementById('annual-increase');
+            const numberOfYearsInput = document.getElementById('number-of-years');
+            const startYearInput = document.getElementById('start-year');
+            
+            const dynamicAdditionalIncreasesDiv = document.getElementById('dynamic-additional-increases');
+            const addNewIncreaseButton = document.getElementById('add-new-increase-btn');
+
+            const calculateButton = document.getElementById('calculate-btn');
+            const printButton = document.getElementById('print-btn'); // عنصر زر الطباعة الجديد
+            const resultsSection = document.getElementById('results-section');
+            const totalSalaryDisplay = document.getElementById('total-salary-display');
+            const salaryTableBody = document.getElementById('salary-table-body');
+            const errorMessage = document.getElementById('error-message');
+            
+            const aiAnalysisSection = document.getElementById('ai-analysis-section');
+            const analyzeSalaryButton = document.getElementById('analyze-salary-btn');
+            const aiLoadingIndicator = document.getElementById('ai-loading-indicator');
+            const aiOutput = document.getElementById('ai-output');
+
+            let finalSalaryAfterCalculationYears = 0;
+            let totalAccumulatedSalaryValue = 0;
+            let currentNumberOfYears = 0;
+            let currentStartYear = 0;
+            let additionalIncreasesData = []; // لتخزين بيانات الزيادات الإضافية المخصصة
+
+            // دالة لتنسيق الأرقام كعملة (دينار أردني)
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('ar-JO', {
+                    style: 'currency',
+                    currency: 'JOD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(amount);
+            }
+
+            // Exponential backoff retry logic for API calls
+            async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (response.ok) {
+                            return response;
+                        }
+                        if (response.status >= 500 || response.status === 429) {
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                            continue;
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    } catch (error) {
+                        if (i === retries - 1) throw error;
+                        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                    }
+                }
+            }
+
+            // دالة لإضافة حقل زيادة إضافية جديد
+            function addIncreaseEntry() {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'additional-increase-item';
+
+                const yearInput = document.createElement('input');
+                yearInput.type = 'number';
+                yearInput.className = 'increase-year';
+                yearInput.placeholder = 'السنة الفعلية (مثال: 2030)';
+                // قيمة افتراضية مقترحة: سنة البدء + 5 سنوات افتراضياً أو السنة الحالية + 5
+                const defaultYear = parseInt(startYearInput.value) || new Date().getFullYear();
+                yearInput.min = defaultYear.toString(); // يجب أن تكون السنة المدخلة أكبر من أو تساوي سنة البدء
+                yearInput.value = defaultYear + 5; 
+                yearInput.required = true;
+
+                const percentInput = document.createElement('input');
+                percentInput.type = 'number';
+                percentInput.className = 'increase-percent';
+                percentInput.placeholder = 'النسبة % (مثال: 10)';
+                percentInput.min = '0';
+                percentInput.step = '0.1';
+                percentInput.value = '2'; // قيمة افتراضية مقترحة
+                percentInput.required = true;
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-increase-btn';
+                removeButton.textContent = 'X';
+                removeButton.addEventListener('click', () => {
+                    itemDiv.remove();
+                    updateAdditionalIncreasesData(); // تحديث البيانات عند الحذف
+                });
+
+                itemDiv.appendChild(yearInput);
+                itemDiv.appendChild(percentInput);
+                itemDiv.appendChild(removeButton);
+                dynamicAdditionalIncreasesDiv.appendChild(itemDiv);
+
+                updateAdditionalIncreasesData(); // تحديث البيانات فوراً بعد الإضافة
+
+                // إضافة مستمعي الأحداث لحقول الإدخال لتحديث البيانات ديناميكياً
+                yearInput.addEventListener('input', updateAdditionalIncreasesData);
+                percentInput.addEventListener('input', updateAdditionalIncreasesData);
+            }
+
+            // دالة لتحديث مصفوفة الزيادات الإضافية بناءً على حقول الإدخال الحالية
+            function updateAdditionalIncreasesData() {
+                additionalIncreasesData = [];
+                const items = dynamicAdditionalIncreasesDiv.querySelectorAll('.additional-increase-item');
+                items.forEach(item => {
+                    const actualYear = parseInt(item.querySelector('.increase-year').value);
+                    const percent = parseFloat(item.querySelector('.increase-percent').value);
+
+                    if (!isNaN(actualYear) && actualYear >= 1 && !isNaN(percent) && percent >= 0) {
+                        additionalIncreasesData.push({ actualYear: actualYear, percent: percent }); // تخزين السنة الفعلية
+                    }
+                });
+                // فرز الزيادات حسب السنة الفعلية لضمان التطبيق الصحيح
+                additionalIncreasesData.sort((a, b) => a.actualYear - b.actualYear);
+            }
+
+
+            addNewIncreaseButton.addEventListener('click', addIncreaseEntry);
+
+
+            calculateButton.addEventListener('click', () => {
+                errorMessage.style.display = 'none';
+                aiAnalysisSection.style.display = 'none';
+                aiOutput.textContent = '';
+
+                const basicSalary = parseFloat(basicSalaryInput.value);
+                const annualIncreaseRate = parseFloat(annualIncreaseInput.value) / 100;
+                const numberOfYears = parseInt(numberOfYearsInput.value);
+                const startYear = parseInt(startYearInput.value);
+                
+                updateAdditionalIncreasesData(); // تحديث البيانات من حقول الزيادات الإضافية قبل الحساب
+
+                // التحقق من صحة المدخلات الأساسية
+                if (isNaN(basicSalary) || basicSalary < 0 ||
+                    isNaN(annualIncreaseRate) || annualIncreaseRate < 0 ||
+                    isNaN(numberOfYears) || numberOfYears < 1 || numberOfYears > 100 ||
+                    isNaN(startYear) || startYear < 1900 || startYear > 2100) {
+                    errorMessage.textContent = 'الرجاء إدخال أرقام صحيحة وموجبة في الحقول الأساسية. عدد السنوات بين 1 و 100، وسنة البدء بين 1900 و 2100.';
+                    errorMessage.style.display = 'block';
+                    resultsSection.style.display = 'none';
+                    return;
+                }
+
+                // التحقق من صحة مدخلات الزيادات الإضافية
+                let validAdditionalIncreases = true;
+                additionalIncreasesData.forEach(item => {
+                    if (isNaN(item.actualYear) || item.actualYear < startYear || item.actualYear > (startYear + numberOfYears -1) || isNaN(item.percent) || item.percent < 0) {
+                        validAdditionalIncreases = false;
+                        errorMessage.textContent = 'الرجاء التأكد من صحة جميع قيم الزيادات الإضافية: السنة يجب أن تكون ضمن نطاق سنوات الحساب والنسبة موجبة.';
+                        errorMessage.style.display = 'block';
+                        resultsSection.style.display = 'none';
+                    }
+                });
+                if (!validAdditionalIncreases) {
+                    return;
+                }
+
+
+                salaryTableBody.innerHTML = '';
+                let currentSalary = basicSalary;
+                let totalAccumulated = 0;
+                currentNumberOfYears = numberOfYears;
+                currentStartYear = startYear;
+
+                for (let i = 0; i < numberOfYears; i++) {
+                    const displayYear = startYear + i; // السنة الفعلية للعرض (2026، 2027...)
+
+                    const salaryAtStartOfYear = currentSalary;
+
+                    let annualIncrementAmount = currentSalary * annualIncreaseRate;
+                    
+                    // تطبيق الزيادات الإضافية المخصصة لهذا العام الفعلي
+                    const applicableAdditionalIncreases = additionalIncreasesData.filter(item => item.actualYear === displayYear);
+                    applicableAdditionalIncreases.forEach(item => {
+                        annualIncrementAmount += (currentSalary * (item.percent / 100));
+                    });
+
+                    const endOfYearSalary = currentSalary + annualIncrementAmount;
+                    
+                    totalAccumulated += (endOfYearSalary * 12); 
+
+                    const row = salaryTableBody.insertRow();
+                    row.insertCell(0).textContent = displayYear;
+                    row.insertCell(1).textContent = formatCurrency(salaryAtStartOfYear);
+                    row.insertCell(2).textContent = formatCurrency(annualIncrementAmount);
+                    row.insertCell(3).textContent = formatCurrency(endOfYearSalary);
+
+                    currentSalary = endOfYearSalary;
+                }
+
+                finalSalaryAfterCalculationYears = currentSalary;
+                totalAccumulatedSalaryValue = totalAccumulated;
+
+                totalSalaryDisplay.textContent = `إجمالي الراتب التراكمي خلال ${numberOfYears} عاماً (من ${startYear} حتى ${startYear + numberOfYears - 1}): ${formatCurrency(totalAccumulatedSalaryValue)}`;
+                resultsSection.style.display = 'block';
+                aiAnalysisSection.style.display = 'block';
+            });
+
+            // وظيفة زر الطباعة
+            printButton.addEventListener('click', () => {
+                window.print();
+            });
+
+
+            analyzeSalaryButton.addEventListener('click', async () => {
+                if (finalSalaryAfterCalculationYears === 0 && totalAccumulatedSalaryValue === 0) {
+                    aiOutput.textContent = 'الرجاء حساب الراتب أولاً قبل طلب التحليل.';
+                    return;
+                }
+
+                aiLoadingIndicator.style.display = 'block';
+                aiOutput.textContent = '';
+
+                try {
+                    const basicSalary = parseFloat(basicSalaryInput.value);
+                    const annualIncreaseRate = parseFloat(annualIncreaseInput.value);
+                    const numYears = currentNumberOfYears;
+                    const startYear = currentStartYear;
+
+                    // بناء وصف الزيادات الإضافية للموجه
+                    let additionalIncreasesDescription = '';
+                    if (additionalIncreasesData.length > 0) {
+                        const formattedIncreases = additionalIncreasesData.map(item => `في عام ${item.actualYear}: زيادة ${item.percent}%`);
+                        additionalIncreasesDescription = `، مع زيادات إضافية كالتالي: ${formattedIncreases.join(', ')}.`;
+                    }
+
+
+                    const prompt = `بناءً على راتب أساسي قدره ${basicSalary.toFixed(2)} دينار أردني، وزيادة سنوية عادية قدرها ${annualIncreaseRate}%، وعدد سنوات الحساب ${numYears} عام بدءاً من سنة ${startYear}${additionalIncreasesDescription}، وراتب متوقع بعد هذه المدة يبلغ ${finalSalaryAfterCalculationYears.toFixed(2)} دينار أردني، وإجمالي راتب تراكمي قدره ${totalAccumulatedSalaryValue.toFixed(2)} دينار أردني؛ ما هي أبرز الملاحظات أو النصائح المالية الموجزة التي يمكنك تقديمها حول هذا المسار الوظيفي مع الأخذ في الاعتبار هذه المعطيات؟ أجب باللغة العربية بأسلوب ودود ومفيد، في حدود 70-120 كلمة، ركز على النقاط الأساسية والتطلعات المستقبلية وفرص النمو المحتملة.`;
+
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    const response = await fetchWithExponentialBackoff(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const generatedText = result.candidates[0].content.parts[0].text;
+                        aiOutput.textContent = generatedText;
+                    } else {
+                        aiOutput.textContent = 'عذراً، لم أتمكن من توليد التحليل. الرجاء المحاولة مرة أخرى.';
+                        console.error('Gemini API response structure unexpected:', result);
+                    }
+                } catch (error) {
+                    console.error('Error calling Gemini API for analysis:', error);
+                    aiOutput.textContent = 'حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. الرجاء التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.';
+                } finally {
+                    aiLoadingIndicator.style.display = 'none';
+                }
+            });
+
+            // إضافة زيادتين افتراضيتين عند التحميل
+            addIncreaseEntry();
+            addIncreaseEntry();
+
+            // تشغيل الحساب عند تحميل الصفحة بالقيم الافتراضية
+            calculateButton.click();
+        });
+    </script>
+</body>
+</html>
